@@ -1,6 +1,6 @@
 // Reemplazá con la IP local de tu máquina (ejecutá `ipconfig getifaddr en0` en Mac)
 const DEV_BASE = 'http://192.168.0.53:3000/api';
-const PROD_BASE = 'https://tu-backend.railway.app/api';
+const PROD_BASE = 'https://hay-examen-backend-production.up.railway.app/api';
 
 export const API_BASE = __DEV__ ? DEV_BASE : PROD_BASE;
 
