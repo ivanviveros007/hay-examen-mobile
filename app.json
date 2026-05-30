@@ -23,8 +23,27 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      ["expo-router", { "root": "app" }],
+      [
+        "expo-router",
+        {
+          "root": "app"
+        }
+      ],
       "@react-native-community/datetimepicker"
-    ]
+    ],
+    "extra": {
+      "router": {
+        "root": "app"
+      },
+      "eas": {
+        "projectId": "59245422-ffa0-4f96-b837-e5e73e3a95e8"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/59245422-ffa0-4f96-b837-e5e73e3a95e8"
+    }
   }
 }
