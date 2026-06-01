@@ -18,6 +18,7 @@ export function HomeScreen() {
   const {
     materias,
     loadingMaterias,
+    examenesMap,
     formState,
     submitting,
     setMateriaId,
@@ -61,7 +62,7 @@ export function HomeScreen() {
               />
             )}
 
-            <FechaPicker fecha={formState.fecha} onChange={setFecha} />
+            <FechaPicker fecha={formState.fecha} onChange={setFecha} examenesMap={examenesMap} />
 
             <TouchableOpacity
               style={[styles.button, (submitting || loadingMaterias) && styles.buttonDisabled]}
