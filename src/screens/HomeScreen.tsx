@@ -6,8 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useExamenForm } from '../hooks/useExamenForm';
@@ -27,65 +25,59 @@ export function HomeScreen() {
   } = useExamenForm();
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
         <Text style={styles.headerGreeting}>Hola Anto! 👋</Text>
         <Text style={styles.headerQuestion}>¿Hay examen?</Text>
       </View>
-      <KeyboardAvoidingView
+      <ScrollView
         style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        contentContainerStyle={styles.container}
+        showsVerticalScrollIndicator={false}
       >
-        <ScrollView
-          style={styles.flex}
-          contentContainerStyle={styles.container}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View style={styles.card}>
-            {loadingMaterias ? (
-              <View style={styles.loaderWrapper}>
-                <ActivityIndicator color="#8B5CF6" size="large" />
-                <Text style={styles.loaderText}>Cargando materias...</Text>
-              </View>
-            ) : materias.length === 0 ? (
-              <View style={styles.errorWrapper}>
-                <Text style={styles.errorIcon}>⚠️</Text>
-                <Text style={styles.errorText}>No se pudo conectar con el servidor.</Text>
-                <Text style={styles.errorHint}>Verificá que el backend esté corriendo.</Text>
-              </View>
+        <View style={styles.card}>
+          {loadingMaterias ? (
+            <View style={styles.loaderWrapper}>
+              <ActivityIndicator color="#8B5CF6" size="large" />
+              <Text style={styles.loaderText}>Cargando materias...</Text>
+            </View>
+          ) : materias.length === 0 ? (
+            <View style={styles.errorWrapper}>
+              <Text style={styles.errorIcon}>⚠️</Text>
+              <Text style={styles.errorText}>No se pudo conectar con el servidor.</Text>
+              <Text style={styles.errorHint}>Verificá que el backend esté corriendo.</Text>
+            </View>
+          ) : (
+            <MateriaPicker
+              materias={materias}
+              selectedId={formState.materiaId}
+              onValueChange={setMateriaId}
+            />
+          )}
+
+          <FechaPicker fecha={formState.fecha} onChange={setFecha} examenesMap={examenesMap} />
+
+          <TouchableOpacity
+            style={[styles.button, (submitting || loadingMaterias) && styles.buttonDisabled]}
+            onPress={handleSubmit}
+            disabled={submitting || loadingMaterias}
+            activeOpacity={0.85}
+          >
+            {submitting ? (
+              <ActivityIndicator color="#FFFFFF" />
             ) : (
-              <MateriaPicker
-                materias={materias}
-                selectedId={formState.materiaId}
-                onValueChange={setMateriaId}
-              />
+              <Text style={styles.buttonText}>Guardar examen 🚀</Text>
             )}
-
-            <FechaPicker fecha={formState.fecha} onChange={setFecha} examenesMap={examenesMap} />
-
-            <TouchableOpacity
-              style={[styles.button, (submitting || loadingMaterias) && styles.buttonDisabled]}
-              onPress={handleSubmit}
-              disabled={submitting || loadingMaterias}
-              activeOpacity={0.85}
-            >
-              {submitting ? (
-                <ActivityIndicator color="#FFFFFF" />
-              ) : (
-                <Text style={styles.buttonText}>Guardar examen 🚀</Text>
-              )}
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#F8F4FF' },
-  flex: { flex: 1 },
+  flex: { flex: 1, backgroundColor: '#F8F4FF' },
   header: {
     alignItems: 'center',
     paddingTop: 12,
@@ -108,13 +100,15 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
     paddingTop: 8,
-    paddingBottom: 40,
+    paddingBottom: 100,
     backgroundColor: '#F8F4FF',
   },
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: 24,
-    padding: 24,
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 16,
     shadowColor: '#6B4E8A',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,

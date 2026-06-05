@@ -102,7 +102,7 @@ export function ExamenesList({
 }
 
 const styles = StyleSheet.create({
-  list: { paddingBottom: 32 },
+  list: { paddingBottom: 100 },
   centered: {
     flex: 1,
     justifyContent: 'center',
