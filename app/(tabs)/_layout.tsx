@@ -38,7 +38,7 @@ export default function TabLayout() {
         name="perfil"
         options={{
           title: 'Mis Exámenes',
-          headerTitle: 'Mis Exámenes',
+          headerTitle: '🎒 Mis Exámenes',
           tabBarIcon: ({ focused }) => <TabIcon emoji="📋" focused={focused} />,
         }}
       />

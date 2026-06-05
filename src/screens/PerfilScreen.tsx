@@ -11,12 +11,9 @@ export function PerfilScreen() {
   const proximos = examenes.filter((e) => new Date(e.fecha) >= new Date()).length;
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={['bottom', 'left', 'right']}>
       <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.emoji}>🎒</Text>
-          <Text style={styles.title}>Mis exámenes</Text>
-          <View style={styles.stats}>
+        <View style={styles.stats}>
             <View style={styles.statItem}>
               <Text style={styles.statNumber}>{total}</Text>
               <Text style={styles.statLabel}>total</Text>
@@ -27,7 +24,6 @@ export function PerfilScreen() {
               <Text style={styles.statLabel}>próximos</Text>
             </View>
           </View>
-        </View>
 
         <ExamenesList
           examenes={examenes}
@@ -44,10 +40,7 @@ export function PerfilScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#F8F4FF' },
-  container: { flex: 1, paddingHorizontal: 20, paddingTop: 8 },
-  header: { alignItems: 'center', marginBottom: 24, paddingTop: 8 },
-  emoji: { fontSize: 60, marginBottom: 10 },
-  title: { fontSize: 28, fontWeight: '800', color: '#3D2060', marginBottom: 16 },
+  container: { flex: 1, paddingHorizontal: 20, paddingTop: 16 },
   stats: {
     flexDirection: 'row',
     backgroundColor: '#FFFFFF',
@@ -61,6 +54,8 @@ const styles = StyleSheet.create({
     elevation: 3,
     gap: 24,
     alignItems: 'center',
+    alignSelf: 'center',
+    marginBottom: 12,
   },
   statItem: { alignItems: 'center' },
   statNumber: { fontSize: 28, fontWeight: '800', color: '#1E1035' },
