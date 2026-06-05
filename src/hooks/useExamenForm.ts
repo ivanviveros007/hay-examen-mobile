@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useFocusEffect } from 'expo-router';
 import { Alert } from 'react-native';
 import type { Materia, Examen } from '../types';
 import { ENDPOINTS } from '../constants/api';
@@ -74,6 +75,17 @@ export function useExamenForm(): UseExamenFormReturn {
     fetchInitialData();
     return () => { cancelled = true; };
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
+      fetch(ENDPOINTS.examenes)
+        .then((res) => (res.ok ? res.json() : Promise.reject()))
+        .then((data: Examen[]) => { if (!cancelled) setExamenesMap(buildExamenesMap(data)); })
+        .catch(() => {});
+      return () => { cancelled = true; };
+    }, [])
+  );
 
   const setMateriaId = useCallback((id: number) => {
     setFormState((prev) => ({ ...prev, materiaId: id }));

@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  FlatList,
+  SectionList,
   View,
   Text,
   StyleSheet,
@@ -17,6 +17,15 @@ interface ExamenesListProps {
   error: string | null;
   onRefresh: () => void;
   onDelete: (id: number) => void;
+}
+
+function getTodayStr(): string {
+  const hoy = new Date();
+  return [
+    hoy.getFullYear(),
+    String(hoy.getMonth() + 1).padStart(2, '0'),
+    String(hoy.getDate()).padStart(2, '0'),
+  ].join('-');
 }
 
 export function ExamenesList({
@@ -58,13 +67,28 @@ export function ExamenesList({
     );
   }
 
+  const todayStr = getTodayStr();
+  const proximos = examenes.filter((e) => e.fecha >= todayStr);
+  const realizados = examenes.filter((e) => e.fecha < todayStr).reverse();
+
+  const sections = [
+    { title: 'Próximos', data: proximos },
+    ...(realizados.length > 0 ? [{ title: 'Realizados', data: realizados }] : []),
+  ];
+
   return (
-    <FlatList
-      data={examenes}
+    <SectionList
+      sections={sections}
       keyExtractor={(item) => String(item.id)}
       renderItem={({ item }) => <ExamenCard examen={item} onDelete={onDelete} />}
+      renderSectionHeader={({ section }) =>
+        section.data.length > 0 ? (
+          <Text style={styles.sectionHeader}>{section.title}</Text>
+        ) : null
+      }
       contentContainerStyle={styles.list}
       showsVerticalScrollIndicator={false}
+      stickySectionHeadersEnabled={false}
       refreshControl={
         <RefreshControl
           refreshing={refreshing}
@@ -100,5 +124,14 @@ const styles = StyleSheet.create({
     color: '#7A6B8A',
     textAlign: 'center',
     lineHeight: 20,
+  },
+  sectionHeader: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#9B8AB0',
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+    marginBottom: 10,
+    marginTop: 4,
   },
 });

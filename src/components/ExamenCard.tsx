@@ -24,7 +24,6 @@ export function ExamenCard({ examen, onDelete }: ExamenCardProps) {
   const color = MATERIA_COLORS[examen.materiaNombre] ?? '#8B5CF6';
   const inicial = examen.materiaNombre.charAt(0).toUpperCase();
 
-  // Suma mediodía para evitar off-by-one por timezone
   const fechaObj = new Date(`${examen.fecha}T12:00:00`);
   const fechaFormateada = fechaObj.toLocaleDateString('es-AR', {
     weekday: 'short',
@@ -33,8 +32,11 @@ export function ExamenCard({ examen, onDelete }: ExamenCardProps) {
     year: 'numeric',
   });
 
-  const diasRestantes = Math.ceil(
-    (fechaObj.getTime() - Date.now()) / (1000 * 60 * 60 * 24),
+  const hoy = new Date();
+  const hoyMidnight = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+  const examMidnight = new Date(examen.fecha + 'T00:00:00');
+  const diasRestantes = Math.round(
+    (examMidnight.getTime() - hoyMidnight.getTime()) / (1000 * 60 * 60 * 24),
   );
 
   const badgeLabel =
