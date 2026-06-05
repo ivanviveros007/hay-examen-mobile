@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
     paddingTop: 8,
-    paddingBottom: 100,
+    paddingBottom: 120,
     backgroundColor: '#F8F4FF',
   },
   card: {

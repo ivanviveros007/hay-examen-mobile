@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BlurView } from 'expo-blur';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 
 const TAB_WIDTH = 130;
@@ -31,7 +32,11 @@ export function CustomTabBar({ state, navigation }: BottomTabBarProps) {
   });
 
   return (
-    <View style={[styles.wrapper, { bottom: insets.bottom + -5 }]}>
+    <BlurView
+      style={[styles.wrapper, { paddingBottom: Math.max(insets.bottom - 16, 6) }]}
+      intensity={10}
+      tint='light'
+    >
       <View style={styles.pill}>
         <Animated.View
           style={[styles.indicator, { transform: [{ translateX: indicatorX }] }]}
@@ -66,14 +71,19 @@ export function CustomTabBar({ state, navigation }: BottomTabBarProps) {
           );
         })}
       </View>
-    </View>
+    </BlurView>
   );
 }
 
 const styles = StyleSheet.create({
   wrapper: {
     position: 'absolute',
-    alignSelf: 'center',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    paddingTop: 2,
+    overflow: 'hidden',
   },
   pill: {
     flexDirection: 'row',
