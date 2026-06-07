@@ -11,6 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useExamenForm } from '../hooks/useExamenForm';
 import { MateriaPicker } from '../components/MateriaPicker';
 import { FechaPicker } from '../components/FechaPicker';
+import { NotaModal } from '../components/NotaModal';
 
 export function HomeScreen() {
   const {
@@ -22,6 +23,10 @@ export function HomeScreen() {
     setMateriaId,
     setFecha,
     handleSubmit,
+    modalVisible,
+    pendingExamen,
+    handleSkipNota,
+    handleSaveNota,
   } = useExamenForm();
 
   return (
@@ -71,6 +76,13 @@ export function HomeScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      <NotaModal
+        visible={modalVisible}
+        materiaName={pendingExamen?.materiaName ?? ''}
+        onSkip={handleSkipNota}
+        onSave={handleSaveNota}
+      />
     </SafeAreaView>
   );
 }

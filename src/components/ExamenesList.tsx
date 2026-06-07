@@ -17,6 +17,7 @@ interface ExamenesListProps {
   error: string | null;
   onRefresh: () => void;
   onDelete: (id: number) => void;
+  onNota?: (examen: Examen) => void;
 }
 
 function getTodayStr(): string {
@@ -35,6 +36,7 @@ export function ExamenesList({
   error,
   onRefresh,
   onDelete,
+  onNota,
 }: ExamenesListProps) {
   if (loading) {
     return (
@@ -80,7 +82,7 @@ export function ExamenesList({
     <SectionList
       sections={sections}
       keyExtractor={(item) => String(item.id)}
-      renderItem={({ item }) => <ExamenCard examen={item} onDelete={onDelete} />}
+      renderItem={({ item }) => <ExamenCard examen={item} onDelete={onDelete} onNota={onNota} />}
       renderSectionHeader={({ section }) =>
         section.data.length > 0 ? (
           <Text style={styles.sectionHeader}>{section.title}</Text>

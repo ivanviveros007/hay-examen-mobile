@@ -9,15 +9,24 @@ interface FormState {
   fecha: Date;
 }
 
+export interface ExamenMapEntry {
+  label: string;
+  hasNota: boolean;
+}
+
 export interface UseExamenFormReturn {
   materias: Materia[];
   loadingMaterias: boolean;
-  examenesMap: Record<string, string>;
+  examenesMap: Record<string, ExamenMapEntry>;
   formState: FormState;
   submitting: boolean;
   setMateriaId: (id: number) => void;
   setFecha: (date: Date) => void;
   handleSubmit: () => Promise<void>;
+  modalVisible: boolean;
+  pendingExamen: { id: number; materiaName: string; fecha: string } | null;
+  handleSkipNota: () => void;
+  handleSaveNota: (nota: string) => Promise<void>;
 }
 
 const buildInitialState = (): FormState => ({
@@ -25,23 +34,33 @@ const buildInitialState = (): FormState => ({
   fecha: new Date(),
 });
 
-function buildExamenesMap(examenes: Examen[]): Record<string, string> {
-  const map: Record<string, string[]> = {};
+function buildExamenesMap(examenes: Examen[]): Record<string, ExamenMapEntry> {
+  const map: Record<string, { names: string[]; hasNota: boolean }> = {};
   for (const e of examenes) {
-    if (!map[e.fecha]) map[e.fecha] = [];
-    map[e.fecha].push(e.materiaNombre);
+    if (!map[e.fecha]) map[e.fecha] = { names: [], hasNota: false };
+    map[e.fecha].names.push(e.materiaNombre);
+    if (e.nota) map[e.fecha].hasNota = true;
   }
   return Object.fromEntries(
-    Object.entries(map).map(([fecha, nombres]) => [fecha, nombres.join(' • ')])
+    Object.entries(map).map(([fecha, { names, hasNota }]) => [
+      fecha,
+      { label: names.join(' • '), hasNota },
+    ])
   );
 }
 
 export function useExamenForm(): UseExamenFormReturn {
   const [materias, setMaterias] = useState<Materia[]>([]);
   const [loadingMaterias, setLoadingMaterias] = useState(true);
-  const [examenesMap, setExamenesMap] = useState<Record<string, string>>({});
+  const [examenesMap, setExamenesMap] = useState<Record<string, ExamenMapEntry>>({});
   const [formState, setFormState] = useState<FormState>(buildInitialState);
   const [submitting, setSubmitting] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [pendingExamen, setPendingExamen] = useState<{
+    id: number;
+    materiaName: string;
+    fecha: string;
+  } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -123,25 +142,76 @@ export function useExamenForm(): UseExamenFormReturn {
         throw new Error(body.message ?? 'Error al guardar');
       }
 
+      const data: Examen = await res.json();
+
       if (materia) {
         setExamenesMap((prev) => {
           const existing = prev[fechaStr];
           return {
             ...prev,
-            [fechaStr]: existing ? `${existing} • ${materia.nombre}` : materia.nombre,
+            [fechaStr]: {
+              label: existing ? `${existing.label} • ${materia.nombre}` : materia.nombre,
+              hasNota: existing?.hasNota ?? false,
+            },
           };
         });
       }
 
-      Alert.alert('¡Listo! 🎉', 'Tu examen fue guardado y agregado al calendario familiar.', [
-        { text: 'OK', onPress: resetForm },
-      ]);
+      setPendingExamen({
+        id: data.id,
+        materiaName: materia?.nombre ?? '',
+        fecha: fechaStr,
+      });
+      setModalVisible(true);
     } catch (err: any) {
       Alert.alert('Error', err.message ?? 'No se pudo guardar el examen. Intentá de nuevo.');
     } finally {
       setSubmitting(false);
     }
-  }, [formState, materias, resetForm]);
+  }, [formState, materias]);
 
-  return { materias, loadingMaterias, examenesMap, formState, submitting, setMateriaId, setFecha, handleSubmit };
+  const handleSkipNota = useCallback(() => {
+    setModalVisible(false);
+    setPendingExamen(null);
+    Alert.alert('¡Listo! 🎉', 'Tu examen fue guardado y agregado al calendario familiar.', [
+      { text: 'OK', onPress: resetForm },
+    ]);
+  }, [resetForm]);
+
+  const handleSaveNota = useCallback(async (nota: string) => {
+    if (!pendingExamen) return;
+    const res = await fetch(ENDPOINTS.updateNota(pendingExamen.id), {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nota }),
+    });
+    if (!res.ok) throw new Error('No se pudo guardar la nota');
+
+    setExamenesMap((prev) => {
+      const existing = prev[pendingExamen.fecha];
+      if (!existing) return prev;
+      return { ...prev, [pendingExamen.fecha]: { ...existing, hasNota: true } };
+    });
+
+    setModalVisible(false);
+    setPendingExamen(null);
+    Alert.alert('¡Listo! 🎉', 'Tu examen fue guardado con la nota. 📝', [
+      { text: 'OK', onPress: resetForm },
+    ]);
+  }, [pendingExamen, resetForm]);
+
+  return {
+    materias,
+    loadingMaterias,
+    examenesMap,
+    formState,
+    submitting,
+    setMateriaId,
+    setFecha,
+    handleSubmit,
+    modalVisible,
+    pendingExamen,
+    handleSkipNota,
+    handleSaveNota,
+  };
 }

@@ -8,6 +8,7 @@ export interface Examen {
   materiaId: number;
   materiaNombre: string;
   fecha: string;        // YYYY-MM-DD
+  nota?: string | null;
   createdAt: string;    // ISO timestamp
   calendarEventId?: string;
 }

@@ -5,7 +5,9 @@ const PROD_BASE = 'https://hay-examen-backend-production.up.railway.app/api';
 export const API_BASE = PROD_BASE;
 
 export const ENDPOINTS = {
-  materias: `${API_BASE}/examenes/materias`,
-  examenes: `${API_BASE}/examenes`,
+  materias:     `${API_BASE}/examenes/materias`,
+  examenes:     `${API_BASE}/examenes`,
   deleteExamen: (id: number) => `${API_BASE}/examenes/${id}`,
+  updateNota:   (id: number) => `${API_BASE}/examenes/${id}/nota`,
+  deleteNota:   (id: number) => `${API_BASE}/examenes/${id}/nota`,
 } as const;

@@ -10,6 +10,8 @@ export interface UseExamenesHistorialReturn {
   error: string | null;
   onRefresh: () => void;
   deleteExamen: (id: number) => Promise<void>;
+  updateNota: (id: number, nota: string) => Promise<void>;
+  deleteNota: (id: number) => Promise<void>;
 }
 
 export function useExamenesHistorial(): UseExamenesHistorialReturn {
@@ -51,5 +53,21 @@ export function useExamenesHistorial(): UseExamenesHistorialReturn {
     setExamenes((prev) => prev.filter((e) => e.id !== id));
   }, []);
 
-  return { examenes, loading, refreshing, error, onRefresh, deleteExamen };
+  const updateNota = useCallback(async (id: number, nota: string) => {
+    const res = await fetch(ENDPOINTS.updateNota(id), {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nota }),
+    });
+    if (!res.ok) throw new Error('No se pudo actualizar la nota');
+    setExamenes((prev) => prev.map((e) => (e.id === id ? { ...e, nota } : e)));
+  }, []);
+
+  const deleteNota = useCallback(async (id: number) => {
+    const res = await fetch(ENDPOINTS.deleteNota(id), { method: 'DELETE' });
+    if (!res.ok) throw new Error('No se pudo borrar la nota');
+    setExamenes((prev) => prev.map((e) => (e.id === id ? { ...e, nota: null } : e)));
+  }, []);
+
+  return { examenes, loading, refreshing, error, onRefresh, deleteExamen, updateNota, deleteNota };
 }

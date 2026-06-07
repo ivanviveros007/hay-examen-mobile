@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Calendar, type DateData } from 'react-native-calendars';
+import type { ExamenMapEntry } from '../hooks/useExamenForm';
 
 interface FechaPickerProps {
   fecha: Date;
   onChange: (date: Date) => void;
-  examenesMap?: Record<string, string>;
+  examenesMap?: Record<string, ExamenMapEntry>;
 }
 
 function toDateString(date: Date): string {
@@ -20,10 +21,10 @@ export function FechaPicker({ fecha, onChange, examenesMap = {} }: FechaPickerPr
 
   const markedDates: Record<string, object> = {};
 
-  for (const f of Object.keys(examenesMap)) {
+  for (const [f, entry] of Object.entries(examenesMap)) {
     markedDates[f] = {
       marked: true,
-      dotColor: '#F59E0B',
+      dotColor: entry.hasNota ? '#06B6D4' : '#F59E0B',
     };
   }
 
@@ -38,8 +39,8 @@ export function FechaPicker({ fecha, onChange, examenesMap = {} }: FechaPickerPr
     const [year, month, dayNum] = day.dateString.split('-').map(Number);
     onChange(new Date(year, month - 1, dayNum));
 
-    const examen = examenesMap[day.dateString];
-    setTooltip(examen ?? null);
+    const entry = examenesMap[day.dateString];
+    setTooltip(entry ? (entry.hasNota ? `${entry.label} 📝` : entry.label) : null);
   };
 
   return (
@@ -84,8 +85,12 @@ export function FechaPicker({ fecha, onChange, examenesMap = {} }: FechaPickerPr
             <Text style={styles.legendText}>Examen cargado</Text>
           </View>
           <View style={styles.legendItem}>
+            <View style={[styles.dot, { backgroundColor: '#06B6D4' }]} />
+            <Text style={styles.legendText}>Con nota</Text>
+          </View>
+          <View style={styles.legendItem}>
             <View style={[styles.dot, { backgroundColor: '#8B5CF6' }]} />
-            <Text style={styles.legendText}>Día seleccionado</Text>
+            <Text style={styles.legendText}>Seleccionado</Text>
           </View>
         </View>
       </View>

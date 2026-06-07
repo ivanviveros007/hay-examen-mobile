@@ -1,11 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useExamenesHistorial } from '../hooks/useExamenesHistorial';
 import { ExamenesList } from '../components/ExamenesList';
+import { NotaBottomSheet } from '../components/NotaBottomSheet';
+import type { Examen } from '../types';
 
 export function PerfilScreen() {
-  const { examenes, loading, refreshing, error, onRefresh, deleteExamen } = useExamenesHistorial();
+  const { examenes, loading, refreshing, error, onRefresh, deleteExamen, updateNota, deleteNota } =
+    useExamenesHistorial();
+  const [selectedExamen, setSelectedExamen] = useState<Examen | null>(null);
 
   const total = examenes.length;
   const proximos = examenes.filter((e) => new Date(e.fecha) >= new Date()).length;
@@ -32,8 +36,17 @@ export function PerfilScreen() {
           error={error}
           onRefresh={onRefresh}
           onDelete={deleteExamen}
+          onNota={(examen) => setSelectedExamen(examen)}
         />
       </View>
+
+      <NotaBottomSheet
+        visible={!!selectedExamen}
+        examen={selectedExamen}
+        onClose={() => setSelectedExamen(null)}
+        onUpdate={updateNota}
+        onDelete={deleteNota}
+      />
     </SafeAreaView>
   );
 }

@@ -18,9 +18,10 @@ const MATERIA_COLORS: Record<string, string> = {
 interface ExamenCardProps {
   examen: Examen;
   onDelete: (id: number) => void;
+  onNota?: (examen: Examen) => void;
 }
 
-export function ExamenCard({ examen, onDelete }: ExamenCardProps) {
+export function ExamenCard({ examen, onDelete, onNota }: ExamenCardProps) {
   const color = MATERIA_COLORS[examen.materiaNombre] ?? '#8B5CF6';
   const inicial = examen.materiaNombre.charAt(0).toUpperCase();
 
@@ -58,9 +59,20 @@ export function ExamenCard({ examen, onDelete }: ExamenCardProps) {
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.materia} numberOfLines={1}>
-          {examen.materiaNombre}
-        </Text>
+        <View style={styles.materiaRow}>
+          <Text style={styles.materia} numberOfLines={1}>
+            {examen.materiaNombre}
+          </Text>
+          {examen.nota && onNota && (
+            <TouchableOpacity
+              onPress={() => onNota(examen)}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              style={styles.notaBtn}
+            >
+              <Text style={styles.notaIcon}>📝</Text>
+            </TouchableOpacity>
+          )}
+        </View>
         <Text style={styles.fecha}>📅 {fechaFormateada}</Text>
       </View>
 
@@ -112,7 +124,10 @@ const styles = StyleSheet.create({
   },
   avatarText: { fontSize: 22, fontWeight: '800', color: '#FFFFFF' },
   content: { flex: 1, marginRight: 8 },
-  materia: { fontSize: 15, fontWeight: '700', color: '#1E1035', marginBottom: 4 },
+  materiaRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
+  materia: { fontSize: 15, fontWeight: '700', color: '#1E1035', flexShrink: 1 },
+  notaBtn: { marginLeft: 6 },
+  notaIcon: { fontSize: 14 },
   fecha: { fontSize: 12, color: '#7A6B8A' },
   badge: {
     borderRadius: 8,
